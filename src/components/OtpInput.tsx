@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
+import { colors, radius, typography } from '../theme';
 
 type OtpInputProps = {
   length?: number;
@@ -13,7 +14,7 @@ export default function OtpInput({
   value,
   onChangeValue,
   onComplete,
-}: OtpInputProps) {
+}: Readonly<OtpInputProps>) {
   const inputsRef = useRef<Array<TextInput | null>>([]);
 
   const cells = useMemo(() => Array.from({ length }, (_, i) => i), [length]);
@@ -30,7 +31,7 @@ export default function OtpInput({
   }
 
   function handleChange(text: string, index: number) {
-    const sanitized = text.replace(/\D/g, '');
+    const sanitized = text.replaceAll(/\D/g, '');
     if (sanitized.length === 0) {
       // no-op on empty insert; keep current value
       return;
@@ -47,7 +48,7 @@ export default function OtpInput({
       current[index + offset] = nextChars[offset];
     }
     const next = current.join('').slice(0, length).padEnd(length, '');
-    onChangeValue(next.replace(/\s/g, ''));
+    onChangeValue(next.replaceAll(/\s/g, ''));
 
     const nextIndex = Math.min(index + nextChars.length, length - 1);
     if (nextIndex < length) {
@@ -105,9 +106,9 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    fontSize: 20,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    fontSize: typography.otp,
   },
 });

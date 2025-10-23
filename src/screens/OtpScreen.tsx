@@ -9,13 +9,21 @@ import {
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
 import OtpInput from '../components/OtpInput';
+import {
+  colors,
+  elevation,
+  layout,
+  radius,
+  spacing,
+  typography,
+} from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Otp'>;
 
 const OTP_LENGTH = 4;
 const TIMER_SECONDS = 120;
 
-export default function OtpScreen({ route, navigation }: Props) {
+export default function OtpScreen({ route, navigation }: Readonly<Props>) {
   const { phoneNumber } = route.params;
   const [code, setCode] = useState(''.padEnd(OTP_LENGTH, ''));
   const [seconds, setSeconds] = useState(TIMER_SECONDS);
@@ -37,7 +45,7 @@ export default function OtpScreen({ route, navigation }: Props) {
 
   function handleSubmit() {
     // In real app, verify OTP via API then navigate
-    navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+    navigation.reset({ index: 0, routes: [{ name: 'Home' as never }] });
   }
 
   function handleResend() {
@@ -58,9 +66,7 @@ export default function OtpScreen({ route, navigation }: Props) {
       <ImageBackground
         style={styles.header}
         resizeMode="cover"
-        source={{
-          uri: 'https://images.unsplash.com/photo-1525182008055-f88b95ff7980?w=1200',
-        }}
+        source={require('../assets/images/otp.png')}
       />
 
       <View style={styles.card}>
@@ -87,12 +93,12 @@ export default function OtpScreen({ route, navigation }: Props) {
 
         <Pressable
           onPress={handleSubmit}
-          disabled={code.replace(/\s/g, '').length !== OTP_LENGTH}
+          disabled={code.replaceAll(/\s/g, '').length !== OTP_LENGTH}
           style={({ pressed }) => [
             styles.fab,
-            code.replace(/\s/g, '').length !== OTP_LENGTH
-              ? styles.fabDisabled
-              : null,
+            code.replaceAll(/\s/g, '').length === OTP_LENGTH
+              ? null
+              : styles.fabDisabled,
             pressed ? styles.fabPressed : null,
           ]}
         >
@@ -106,46 +112,52 @@ export default function OtpScreen({ route, navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#f3f7ff' },
-  header: { height: 260, backgroundColor: '#1E64F0' },
+  root: { flex: 1, backgroundColor: colors.background },
+  header: { height: 450, backgroundColor: colors.primary },
   card: {
     position: 'absolute',
-    top: 140,
-    left: 20,
-    right: 20,
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 14,
+    bottom: 300,
+    left: spacing.xxl,
+    right: spacing.xxl,
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl,
+    padding: spacing.xl,
+    ...elevation.card,
     alignItems: 'center',
   },
-  title: { fontSize: 22, fontWeight: '700' },
-  subtitle: { color: '#637082', marginTop: 8 },
+  title: {
+    fontSize: typography.title,
+    fontWeight: typography.weight.bold as any,
+  },
+  subtitle: { color: colors.textMuted, marginTop: spacing.sm },
   metaRow: {
-    marginTop: 12,
+    marginTop: spacing.md,
     alignSelf: 'stretch',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  time: { color: '#9E9E9E' },
-  resend: { color: '#2D7CF6', fontWeight: '600' },
+  time: { color: colors.hint },
+  resend: {
+    color: colors.primaryStrong,
+    fontWeight: typography.weight.semibold as any,
+  },
   resendDisabled: { color: '#AFC6FB' },
   fab: {
-    marginTop: 20,
-    height: 56,
-    width: 56,
-    borderRadius: 28,
-    backgroundColor: '#2D7CF6',
+    marginTop: spacing.xl,
+    height: layout.fabSize,
+    width: layout.fabSize,
+    borderRadius: radius.round,
+    backgroundColor: colors.primaryStrong,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  fabDisabled: { backgroundColor: '#9bbdf9' },
+  fabDisabled: { backgroundColor: colors.primaryWeak },
   fabPressed: { opacity: 0.85 },
-  fabText: { color: '#fff', fontSize: 26, fontWeight: '600' },
+  fabText: {
+    color: colors.white,
+    fontSize: typography.icon,
+    fontWeight: typography.weight.semibold as any,
+  },
   waves: { flex: 1 },
 });
